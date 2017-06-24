@@ -7,10 +7,8 @@
   <meta property="og:title" content="LSD Software">
   <meta property="og:description" content="LSD software developer website.">
 
+  <link rel="stylesheet" href="css/common.css">
   <style>
-    body {
-      font-family: Helvetica, Arial, sans-serif;
-    }
     .label {
       margin-top: 5px;
       color: #888;
@@ -20,12 +18,11 @@
       margin-top: 10px;
     }
     #txtComment {
-      width: 300px;
+      width: 350px;
       height: 100px;
-      box-sizing: border-box;
     }
     #txtEmail {
-      width: 300px;
+      width: 350px;
     }
     #imgLoading {
       display: none;
@@ -53,11 +50,13 @@
       $("#imgLoading").show();
       $.ajax({
         method: "POST",
-        url: "https://support.lsdsoftware.com:30112/read-aloud/report-issue",
-        data: {
-          url: getParameterByName("subject"),
-          comment: $("#txtEmail").val() + "\n" + $("#txtComment").val()
-        },
+        url: "https://support.lsdsoftware.com:30112/lsdsoftware/submit-feedback",
+        contentType: "application/json",
+        data: JSON.stringify({
+          subject: getParameterByName("subject"),
+          from: $("#txtEmail").val(),
+          body: $("#txtComment").val()
+        }),
         success: function() {
           $("#imgLoading").hide();
           $("#lblStatus").show().toggleClass("error", false).text("Thank you for your feedback.");
@@ -71,14 +70,16 @@
   </script>
 </head>
 <body>
-  <div class="label">Comment or question</div>
-  <textarea id="txtComment"></textarea>
-  <div class="label">Email (optional)</div>
-  <input id="txtEmail" type="text" />
-  <div class="label two"></div>
-  <input id="btnSubmit" type="button" value="Submit" onclick="submitFeedback()" />
-  <img id="imgLoading" src="img/loading.gif" />
-  <div class="label"></div>
-  <span id="lblStatus"></span>
+  <div class="page">
+    <h1>Feedback</h1>
+    <div class="label">Comment or question</div>
+    <textarea id="txtComment"></textarea>
+    <div class="label">Email (optional)</div>
+    <input id="txtEmail" type="text" />
+    <div class="label two"></div>
+    <input id="btnSubmit" type="button" value="Submit" onclick="submitFeedback()" />
+    <img id="imgLoading" src="img/loading.gif" />
+    <div class="label"></div>
+    <span id="lblStatus"></span>
 </body>
 </html>

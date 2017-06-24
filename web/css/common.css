@@ -1,0 +1,12 @@
+body {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+textarea, input {
+  box-sizing: border-box;
+}
+
+.page {
+  max-width: 1024px;
+  margin: 0 auto;
+}
