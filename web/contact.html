@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LSD Software</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="LSD software developer website.">
+  <meta property="og:title" content="LSD Software">
+  <meta property="og:description" content="LSD software developer website.">
+
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+    }
+    .label {
+      margin-top: 5px;
+      color: #888;
+      font-size: small;
+    }
+    .label.two {
+      margin-top: 10px;
+    }
+    #txtComment {
+      width: 300px;
+      height: 100px;
+      box-sizing: border-box;
+    }
+    #txtEmail {
+      width: 300px;
+    }
+    #imgLoading {
+      display: none;
+    }
+    #lblStatus {
+      display: none;
+      font-weight: bold;
+      font-size: small;
+      color: green;
+    }
+    #lblStatus.error {
+      color: red;
+    }
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    function getParameterByName(name) {
+      var match = RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
+      return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+    function submitFeedback() {
+      $("#btnSubmit").hide();
+      $("#imgLoading").show();
+      $.ajax({
+        method: "POST",
+        url: "https://support.lsdsoftware.com:30112/read-aloud/report-issue",
+        data: {
+          url: getParameterByName("subject"),
+          comment: $("#txtEmail").val() + "\n" + $("#txtComment").val()
+        },
+        success: function() {
+          $("#imgLoading").hide();
+          $("#lblStatus").show().toggleClass("error", false).text("Thank you for your feedback.");
+        },
+        error: function() {
+          $("#imgLoading").hide();
+          $("#lblStatus").show().toggleClass("error", true).html("An error occurred, please email us directly at <a href='mailto:admin@lsdsoftware.com'>admin@lsdsoftware.com</a>.  Thank you!");
+        }
+      })
+    }
+  </script>
+</head>
+<body>
+  <div class="label">Comment or question</div>
+  <textarea id="txtComment"></textarea>
+  <div class="label">Email (optional)</div>
+  <input id="txtEmail" type="text" />
+  <div class="label two"></div>
+  <input id="btnSubmit" type="button" value="Submit" onclick="submitFeedback()" />
+  <img id="imgLoading" src="img/loading.gif" />
+  <div class="label"></div>
+  <span id="lblStatus"></span>
+</body>
+</html>
