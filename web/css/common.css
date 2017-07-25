@@ -1,5 +1,6 @@
 body {
   font-family: Helvetica, Arial, sans-serif;
+  background: url(../img/logo.png) no-repeat right center;
 }
 
 textarea, input {
