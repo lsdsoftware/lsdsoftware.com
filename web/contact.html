@@ -50,7 +50,7 @@
       $("#imgLoading").show();
       $.ajax({
         method: "POST",
-        url: "https://support.lsdsoftware.com:30112/lsdsoftware/submit-feedback",
+        url: "https://support.lsdsoftware.com/lsdsoftware/submit-feedback",
         contentType: "application/json",
         data: JSON.stringify({
           subject: getParameterByName("subject"),
