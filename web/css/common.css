@@ -1,6 +1,5 @@
 body {
   font-family: Helvetica, Arial, sans-serif;
-  background: url(../img/logo.png) no-repeat right center;
 }
 
 textarea, input {
@@ -10,4 +9,8 @@ textarea, input {
 .page {
   max-width: 1024px;
   margin: 0 auto;
+}
+
+.logo {
+  width: 48px;
 }
