@@ -50,12 +50,13 @@
       $("#imgLoading").show();
       $.ajax({
         method: "POST",
-        url: "https://support.lsdsoftware.com/lsdsoftware/submit-feedback",
+        url: "https://support.lsdsoftware.com:30299/lsdsoftware?capabilities=submitFeedback-1.0",
         contentType: "application/json",
         data: JSON.stringify({
+          method: "submitFeedback",
           subject: getParameterByName("subject"),
-          from: $("#txtEmail").val(),
-          body: $("#txtComment").val()
+          email: $("#txtEmail").val(),
+          message: $("#txtComment").val()
         }),
         success: function() {
           $("#imgLoading").hide();
