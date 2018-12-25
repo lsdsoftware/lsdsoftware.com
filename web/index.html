@@ -28,7 +28,6 @@
 <body>
   <div class="page">
     <h1>
-      <img src="img/logo.png" class="logo" />
       LSD Software
     </h1>
     <h2>Our Products</h2>
@@ -62,6 +61,29 @@
       <li><a class="my-email">Drop me an email</a></li>
       <li><a href="https://www.paypal.me/lsdsoftware/5">Buy me a cup'a coffee</a></li>
     </ul>
+
+    <div class="play-wolf">
+      <style type="text/css">
+        .play-wolf { margin-top: 3em; }
+        .dosbox-align { display: inline-block; text-align: center; }
+        .dosbox-container { width: 640px; height: 400px; }
+        .dosbox-container > .dosbox-overlay { background: url(img/wolf.png); }
+        .dosbox-container .dosbox-powered { top: 1em; right: 2em; }
+      </style>
+      <div class="dosbox-align">
+        <div id="dosbox"></div>
+        <a href="javascript:dosbox.requestFullScreen();">Make fullscreen</a>
+      </div>
+      <script type="text/javascript" src="https://js-dos.com/cdn/js-dos-api.js"></script>
+      <script type="text/javascript">
+        var dosbox = new Dosbox({
+          id: "dosbox",
+          onload: function (dosbox) {
+            dosbox.run("https://js-dos.com/cdn/upload/Wolf-Deva.zip", "./WOLF3D/Wolf3d.exe");
+          }
+        });
+      </script>
+    </div>
   </div>
 </body>
 </html>
