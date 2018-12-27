@@ -17,6 +17,7 @@
   <meta property="og:description" content="LSD Software developer website.">
 
   <link rel="stylesheet" href="css/common.css">
+  <script src="js/jszip.min.js"></script>
   <script>
     window.onload = function() {
       var elems = document.getElementsByClassName("my-email");
@@ -74,14 +75,39 @@
         <div id="dosbox"></div>
         <a href="javascript:dosbox.requestFullScreen();">Make fullscreen</a>
       </div>
-      <script type="text/javascript" src="https://js-dos.com/cdn/js-dos-api.js"></script>
+      <script type="text/javascript" src="js/js-dos-api.js"></script>
       <script type="text/javascript">
         var dosbox = new Dosbox({
           id: "dosbox",
           onload: function (dosbox) {
-            dosbox.run("https://js-dos.com/cdn/upload/Wolf-Deva.zip", "./WOLF3D/Wolf3d.exe");
+            dosbox.run("https://js-dos.com/cdn/upload/Wolf-Deva.zip", "./WOLF3D/Wolf3d.exe", {
+              saveFiles: retrieveSaveFiles()
+            });
           }
         });
+
+        window.onunload = function() {
+          storeSaveFiles();
+        }
+
+        function retrieveSaveFiles() {
+          var text = localStorage.getItem("files");
+          if (text) {
+            var files = JSON.parse(text);
+            files.forEach(function(file) {
+              file.data = Uint8Array.from(file.data);
+            })
+            return files;
+          }
+        }
+
+        function storeSaveFiles() {
+          var files = dosbox.getSaveFiles("WOLF3D/SAVE*");
+          files.forEach(function(file) {
+            file.data = Array.from(file.data);
+          })
+          localStorage.setItem("files", JSON.stringify(files));
+        }
       </script>
     </div>
   </div>
