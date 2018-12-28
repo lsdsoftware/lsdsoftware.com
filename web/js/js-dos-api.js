@@ -223,34 +223,18 @@ function(a,b){jQuery.fn[b]=function(d){return d?this.bind(b,d):this.trigger(b)}}
           return function(data) {
             var bytes;
             bytes = _this._toArray(data);
-            Promise.resolve(bytes)
-              .then(injectSaveFiles)
-              .then(mount);
-          };
-          function injectSaveFiles(bytes) {
-            if (options.saveFiles) {
-              if (typeof JSZip != "undefined") {
-                return JSZip.loadAsync(bytes)
-                  .then(function(zip) {
-                    options.saveFiles.forEach(function(item) {
-                      zip.file(item.file, item.data);
-                    });
-                    return zip.generateAsync({type: "uint8array"});
-                  });
-              } else {
-                typeof console !== "undefined" && console !== null ? typeof console.warn === "function" ? console.warn("Unable to inject save files - JSZip not found") : void 0 : void 0;
-                return bytes;
-              }
-            }
-            else {
-              return bytes;
-            }
-          }
-          function mount(bytes) {
             if (_this._mountZip(bytes)) {
+              injectSaveFiles();
               return options.success();
             } else {
               return typeof console !== "undefined" && console !== null ? typeof console.error === "function" ? console.error('Unable to mount', url) : void 0 : void 0;
+            }
+          };
+          function injectSaveFiles() {
+            if (options.saveFiles) {
+              options.saveFiles.forEach(function(item) {
+                _this.module.FS.writeFile(item.file, item.data, {encoding: "binary"});
+              })
             }
           }
         })(this),
