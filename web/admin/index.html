@@ -67,7 +67,12 @@
         item = Object.assign({}, item, {comment: undefined, level: undefined});
         $(elem).children().slice(2).remove();
         var td = $("<td colspan='3'>").appendTo(elem);
-        $("<pre>").text(JSON.stringify(item, null, 2) + "\n" + comment).appendTo(td);
+        $("<pre>").css({
+            "white-space": "pre-wrap",
+            "word-break": "break-all"
+          })
+          .text(JSON.stringify(item, null, 2) + "\n" + comment)
+          .appendTo(td);
       }
 
       function trunc(comment) {
