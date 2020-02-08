@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+      .item {
+        margin: .25em;
+      }
+      .link {
+        color: blue;
+        cursor: pointer;
+      }
+      .link:hover {
+        text-decoration: underline;
+      }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://assets.lsdsoftware.com/databind.js"></script>
+    <script>
+      pass = prompt("Enter password:");
+      items = [];
+      progress = 0;
+      loadMore();
+
+      function loadMore() {
+        progress++;
+        $.get({
+          url: "https://support.lsdsoftware.com/admin/read-aloud/get-issue-reports",
+          data: {
+            pass: pass,
+            offset: items.length,
+            limit: 50,
+            t: Date.now()
+          },
+          dataType: "json",
+          success: function(res) {
+            if (res.length) items.push.apply(items, res);
+          },
+          complete: function() {
+            progress--;
+          }
+        })
+      }
+
+      function clear() {
+        progress++;
+        $.post({
+          url: "https://support.lsdsoftware.com/admin/read-aloud/clear-issue-reports",
+          data: {
+            pass: pass
+          },
+          success: function() {
+            items = [];
+            loadMore();
+          },
+          complete: function() {
+            progress--;
+          }
+        })
+      }
+
+      function showDetails(elem, item) {
+        var comment = item.comment;
+        item = Object.assign({}, item, {comment: undefined, level: undefined});
+        $(elem).children().slice(2).remove();
+        var td = $("<td colspan='3'>").appendTo(elem);
+        $("<pre>").text(JSON.stringify(item, null, 2) + "\n" + comment).appendTo(td);
+      }
+
+      function trunc(comment) {
+        return comment.split('\n')[0];
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <h1>Issue Reports</h1>
+
+      <table class="table table-sm table-striped">
+        <tr class="item" bind-repeater-i="#items.length" bind-var-item="#items[#i]">
+          <td bind-var-time="moment(#item.ts)">{{#time.isSame(moment(), "day") ? #time.format("HH:mm") : #time.format("MM/DD HH:mm")}}</td>
+          <td>{{#item.level == 'e' ? '█' : ''}}</td>
+          <td style="color: gray">{{#item.userAgent.slice(#item.userAgent.lastIndexOf(')') +2)}}</td>
+          <td>{{this.trunc(#item.comment)}}</td>
+          <td class="link" bind-event-click="this.showDetails(thisElem.parentNode, #item)">Info</td>
+        </tr>
+      </table>
+      
+      <div bind-statement-1="$(thisElem).toggle(!#progress)">
+        <button type="button" class="btn btn-primary" bind-event-click="this.loadMore()">More</button>
+        <button type="button" class="btn btn-warning" bind-statement-1="$(thisElem).toggle(#items.length > 0)" bind-event-click="this.clear()">Clear</button>
+      </div>
+
+      <div bind-statement-1="$(thisElem).toggle(!!#progress)">
+        <img src="../img/loading.gif"/>
+      </div>
+  </div>
+  </body>
+</html>
