@@ -28,7 +28,7 @@
       function loadMore() {
         progress++;
         $.get({
-          url: "https://support.lsdsoftware.com/admin/read-aloud/get-issue-reports",
+          url: "https://support.readaloud.app/admin/read-aloud/get-issue-reports",
           data: {
             pass: pass,
             offset: items.length,
@@ -48,7 +48,7 @@
       function clear() {
         progress++;
         $.post({
-          url: "https://support.lsdsoftware.com/admin/read-aloud/clear-issue-reports",
+          url: "https://support.readaloud.app/admin/read-aloud/clear-issue-reports",
           data: {
             pass: pass
           },
