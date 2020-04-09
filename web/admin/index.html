@@ -81,11 +81,14 @@
     </script>
   </head>
   <body>
-    <div class="container-fluid">
+    <div class="container-fluid" bind-var-only-errors="false">
       <h1>Issue Reports</h1>
+      <label>
+        <input type="checkbox" bind-event-change="#onlyErrors = thisElem.checked"> Errors only
+      </label>
 
       <table class="table table-sm table-striped">
-        <tr class="item" bind-repeater-i="#items.length" bind-var-item="#items[#i]">
+        <tr class="item" bind-repeater-i="#items.length" bind-var-item="#items[#i]" bind-statement-1="$(thisElem).toggle(!#onlyErrors || #item.level == 'e')">
           <td bind-var-time="moment(#item.ts)">{{#time.isSame(moment(), "day") ? #time.format("HH:mm") : #time.format("MM/DD HH:mm")}}</td>
           <td>{{#item.level == 'e' ? '█' : ''}}</td>
           <td style="color: gray">{{#item.userAgent.slice(#item.userAgent.lastIndexOf(')') +2)}}</td>
