@@ -30,7 +30,7 @@
         $.get({
           url: "https://support.readaloud.app/admin/read-aloud/get-issue-reports",
           data: {
-            pass: pass,
+            secret: pass,
             offset: items.length,
             limit: 50,
             t: Date.now()
@@ -48,10 +48,7 @@
       function clear() {
         progress++;
         $.post({
-          url: "https://support.readaloud.app/admin/read-aloud/clear-issue-reports",
-          data: {
-            pass: pass
-          },
+          url: "https://support.readaloud.app/admin/read-aloud/clear-issue-reports?secret=" + pass,
           success: function() {
             items = [];
             loadMore();
