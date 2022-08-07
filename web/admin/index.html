@@ -70,6 +70,21 @@
           })
           .text(JSON.stringify(item, null, 2) + "\n" + comment)
           .appendTo(td);
+        var match = /\S+@\S+/.exec(comment)
+        if (match) {
+          var to = match[0]
+          var subject = "Read Aloud browser extension"
+          var body = "Hi there,\n\n" +
+            "You reported: " + comment.slice(0, match.index).trim().replace(/\n/g, ". ") + "\n" +
+            "On this page: " + item.url + "\n\n\n";
+          $("<span class='link'>Reply</span>")
+            .click(function() {
+              window.open("mailto:" + encodeURIComponent(to) + "?" +
+                "subject=" + encodeURIComponent(subject) + "&" +
+                "body=" + encodeURIComponent(body))
+            })
+            .appendTo(td)
+        }
       }
 
       function trunc(comment) {
