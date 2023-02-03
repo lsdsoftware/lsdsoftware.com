@@ -63,7 +63,7 @@
         var comment = item.comment;
         item = Object.assign({}, item, {comment: undefined, level: undefined});
         $(elem).children().slice(2).remove();
-        var td = $("<td colspan='3'>").appendTo(elem);
+        var td = $("<td colspan='6'>").appendTo(elem);
         $("<pre>").css({
             "white-space": "pre-wrap",
             "word-break": "break-all"
@@ -100,9 +100,15 @@
       </label>
 
       <table class="table table-sm table-striped">
-        <tr class="item" bind-repeater-i="#items.length" bind-var-item="#items[#i]" bind-statement-1="$(thisElem).toggle(!#onlyErrors || #item.level == 'e')">
+        <tr class="item"
+          bind-repeater-i="#items.length"
+          bind-var-item="#items[#i]"
+          bind-statement-1="$(thisElem).toggle(!#onlyErrors || #item.level == 'e')">
+          <td style="width: .5em;" bind-statement-2="$(thisElem).toggleClass('bg-success', #item.version == '2.1.0')"></td>
           <td style="white-space: nowrap;" bind-var-time="moment(#item.ts)">{{#time.isSame(moment(), "day") ? #time.format("HH:mm") : #time.format("MM/DD HH:mm")}}</td>
           <td>{{#item.level == 'e' ? 'E' : ''}}</td>
+          <td style="white-space: nowrap;">{{#item.version}}</td>
+          <td style="white-space: nowrap;">{{#item.ip}}</td>
           <td style="white-space: nowrap; color: gray;">{{#item.userAgent.slice(#item.userAgent.lastIndexOf(')') +2)}}</td>
           <td>{{this.trunc(#item.comment)}}</td>
           <td class="link" bind-event-click="this.showDetails(thisElem.parentNode, #item)">Info</td>
