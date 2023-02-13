@@ -110,7 +110,7 @@
           <td style="white-space: nowrap;">{{#item.version}}</td>
           <td style="white-space: nowrap;">{{#item.ip}}</td>
           <td style="white-space: nowrap; color: gray;">{{#item.userAgent.slice(#item.userAgent.lastIndexOf(')') +2)}}</td>
-          <td>{{this.trunc(#item.comment)}}</td>
+          <td bind-statement-1="$(thisElem).css('font-weight', /^(Error|TypeError):/.test(#item.comment) ? 'normal' : 'bold')">{{this.trunc(#item.comment)}}</td>
           <td class="link" bind-event-click="this.showDetails(thisElem.parentNode, #item)">Info</td>
         </tr>
       </table>
