@@ -21,6 +21,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://assets.lsdsoftware.com/databind.js"></script>
     <script>
+      const queryString = new URLSearchParams(location.search)
       pass = prompt("Enter password:");
       items = [];
       progress = 0;
@@ -108,7 +109,7 @@
           bind-repeater-i="#items.length"
           bind-var-item="#items[#i]"
           bind-statement-1="$(thisElem).toggle(!#onlyErrors || #item.level == 'e')">
-          <td style="width: .5em;" bind-statement-2="$(thisElem).toggleClass('bg-success', #item.version == '2.1.0')"></td>
+          <td style="width: .5em;" bind-statement-1="$(thisElem).toggleClass('bg-success', #item.version == queryString.get('highlightVersion'))"></td>
           <td style="white-space: nowrap;" bind-var-time="moment(#item.ts)">{{#time.isSame(moment(), "day") ? #time.format("HH:mm") : #time.format("MM/DD HH:mm")}}</td>
           <td>{{#item.level == 'e' ? 'E' : ''}}</td>
           <td style="white-space: nowrap;">{{#item.version}}</td>
