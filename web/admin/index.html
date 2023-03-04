@@ -104,12 +104,10 @@
         <label class="form-check-label" for="cbErrorOnly">Errors only</label>
       </div>
 
-      <table class="mt-2 table table-sm table-striped">
-        <tr class="item"
-          bind-repeater-i="#items.length"
-          bind-var-item="#items[#i]"
+      <table class="mt-2 table table-sm">
+        <tr class="item" bind-repeater-i="#items.length" bind-var-item="#items[#i]"
+          bind-statement-2="$(thisElem).toggleClass('table-warning', #item.version == queryString.get('highlightVersion'))"
           bind-statement-1="$(thisElem).toggle(!#onlyErrors || #item.level == 'e')">
-          <td style="width: .5em;" bind-statement-1="$(thisElem).toggleClass('bg-success', #item.version == queryString.get('highlightVersion'))"></td>
           <td style="white-space: nowrap;" bind-var-time="moment(#item.ts)">{{#time.isSame(moment(), "day") ? #time.format("HH:mm") : #time.format("MM/DD HH:mm")}}</td>
           <td>{{#item.level == 'e' ? 'E' : ''}}</td>
           <td style="white-space: nowrap;">{{#item.version}}</td>
