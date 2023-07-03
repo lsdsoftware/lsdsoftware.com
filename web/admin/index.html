@@ -92,6 +92,16 @@
       function trunc(comment) {
         return comment.split('\n')[0];
       }
+
+      function detectBrowser(ua) {
+        if (ua.includes("Opera") || ua.includes('OPR')) return 'Opera'
+        else if (ua.includes("Edg")) return 'Edge'
+        else if (ua.includes("Chrome")) return 'Chrome'
+        else if (ua.includes("Safari")) return 'Safari'
+        else if (ua.includes("Firefox")) return 'Firefox'
+        else if (ua.includes("MSIE") || document.documentMode) return 'IE'
+        else return 'unknown'
+      }
     </script>
   </head>
   <body>
@@ -104,21 +114,24 @@
         <label class="form-check-label" for="cbErrorOnly">Errors only</label>
       </div>
 
-      <table class="mt-2 table table-sm">
+      <table class="mt-2 table table-sm table-hover">
         <tr class="item" bind-repeater-i="#items.length" bind-var-item="#items[#i]"
-          bind-statement-2="$(thisElem).toggleClass('table-warning', #item.version == queryString.get('highlightVersion'))"
           bind-statement-1="$(thisElem).toggle(!#onlyErrors || #item.level == 'e')">
           <td style="white-space: nowrap;" bind-var-time="moment(#item.ts)">{{#time.isSame(moment(), "day") ? #time.format("HH:mm") : #time.format("MM/DD HH:mm")}}</td>
           <td>{{#item.level == 'e' ? 'E' : ''}}</td>
-          <td style="white-space: nowrap;">{{#item.version}}</td>
+          <td style="white-space: nowrap;"
+            bind-statement-2="$(thisElem).toggleClass('table-warning', #item.version == queryString.get('highlightVersion'))">{{#item.version}}</td>
           <td style="white-space: nowrap;">{{#item.ip}}</td>
-          <td style="white-space: nowrap; color: gray;">{{#item.userAgent.slice(#item.userAgent.lastIndexOf(')') +2)}}</td>
+          <td style="white-space: nowrap;"
+            bind-var-colors="{Chrome: 'green', Firefox: 'red', Edge: 'blue'}"
+            bind-var-browser="#item.userAgent && detectBrowser(#item.userAgent)"
+            bind-statement-1="$(thisElem).css('color', #colors[#browser])">{{#browser}}</td>
           <td style="overflow-wrap: anywhere"
             bind-statement-1="$(thisElem).css('font-weight', /^(Error|TypeError):/.test(#item.comment) ? 'normal' : 'bold')">{{this.trunc(#item.comment)}}</td>
           <td class="link" bind-event-click="this.showDetails(thisElem.parentNode, #item)">Info</td>
         </tr>
       </table>
-      
+
       <div bind-statement-1="$(thisElem).toggle(!#progress)">
         <button type="button" class="btn btn-primary" bind-event-click="this.loadMore()">More</button>
         <button type="button" class="btn btn-warning" bind-statement-1="$(thisElem).toggle(#items.length > 0)" bind-event-click="this.clear()">Clear</button>
