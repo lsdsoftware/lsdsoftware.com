@@ -3,7 +3,6 @@ self.addEventListener('push', function(event) {
     const nInfo = getNotificationInfo(event.data.json());
     const promise = self.registration.showNotification(nInfo.title, {
         body: nInfo.body,
-        tag: "lsdsoftware",
     })
     event.waitUntil(promise);
 })
