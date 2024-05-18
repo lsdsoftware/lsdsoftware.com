@@ -8,19 +8,26 @@
   <title>Subscribe to Push Notification</title>
 
   <script>
-    var opts = {
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array('BHYPRZUHUKPUa5d0QD30Kp76eKYufJNgPEb6fXYUN0i5YqZeq3KX5eXH6TCz2glcLGN-gGoziAUJ08lbLzB-FPs')
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-      navigator.serviceWorker.register('../js/push-sw.js')
-        .also(() => appendLog('Service worker successfully registered.'))
-        .then(reg => reg.pushManager.subscribe(opts))
-        .also(sub => appendLog('Received PushSubscription: ' + JSON.stringify(sub, null, 4)))
-        .then(sub => callService("lsdsoftware", ["addAdminPushSubscription-1.0"], {method: "addAdminPushSubscription", subscription: sub, secret: prompt("1+1=?")}))
-        .also(() => appendLog('Server updated.'))
-        .catch(err => appendLog(err.stack || err.message))
+    document.addEventListener("DOMContentLoaded", async function () {
+      try {
+        await navigator.serviceWorker.register('../js/push-sw.js')
+        appendLog('Service worker successfully registered.')
+        const reg = await navigator.serviceWorker.ready
+        const sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array('BHYPRZUHUKPUa5d0QD30Kp76eKYufJNgPEb6fXYUN0i5YqZeq3KX5eXH6TCz2glcLGN-gGoziAUJ08lbLzB-FPs')
+        })
+        appendLog('Received PushSubscription: ' + JSON.stringify(sub, null, 4))
+        await callService("lsdsoftware", ["addAdminPushSubscription-1.0"], {
+          method: "addAdminPushSubscription",
+          subscription: sub,
+          secret: prompt("1+1=?")
+        })
+        appendLog('Server updated.')
+      }
+      catch (err) {
+        appendLog(err.stack || err.message)
+      }
     })
 
     async function callService(name, capabilities, req) {
@@ -35,10 +42,6 @@
 
     function appendLog(msg) {
       document.getElementById("log").textContent += msg + "\n";
-    }
-
-    Promise.prototype.also = function (consume) {
-      return this.then(result => Promise.resolve(consume(result)).then(() => result))
     }
 
     /**
