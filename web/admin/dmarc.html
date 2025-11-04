@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>DMARC Reports</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://assets.lsdsoftware.com/lib/databind.js"></script>
+    <script>
+      const queryString = new URLSearchParams(location.search)
+      pass = prompt("Enter password:");
+      items = [];
+      current = 0
+      error = null
+      load()
+
+      async function load() {
+        error = null
+        try {
+          const res = await fetch("https://service.lsdsoftware.com/lsdsoftware?capabilities=getDmarcReports-1", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              method: 'getDmarcReports',
+              pass
+            })
+          })
+          const emails = await res.json()
+          items = emails.flatMap(email => {
+            const reports = email.reports
+            delete email.reports
+            return reports.map(report => ({ email, ...report }))
+          })
+          current = 0
+        } catch (err) {
+          error = err
+        }
+      }
+
+      async function clear() {
+        error = null
+        try {
+          const res = await fetch("https://service.lsdsoftware.com/lsdsoftware?capabilities=clearDmarcReports-1", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              method: 'clearDmarcReports',
+              pass
+            })
+          })
+          const items = await res.json()
+          console.log(items.length, 'records deleted')
+          load()
+        } catch (err) {
+          error = err
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="mt-4 d-flex">
+        <div class="input-group">
+          <button type="button" class="btn btn-primary"
+            bind-statement-1="thisElem.disabled = !(#current > 0)"
+            bind-event-click="#current--">&#x21d0;</button>
+          <label class="input-group-text">{{#current + 1}} of {{#items.length || 0}}</label>
+          <button type="button" class="btn btn-primary"
+            bind-statement-1="thisElem.disabled = !(#current + 1 < #items.length)"
+            bind-event-click="#current++">&#x21d2;</button>
+        </div>
+        <div class="ml-auto text-nowrap">
+          <span class="me-2" style="color: red;">{{#error}}</span>
+          <button type="button" class="btn btn-secondary"
+            bind-event-click="this.load()">&#x21bb;</button>
+          <button type="button" class="btn btn-danger"
+            bind-event-click="this.clear()">Clear</button>
+        </div>
+      </div>
+      <div bind-repeater-if="#current < #items.length ? 1 : 0"
+        bind-var-item="#items[#current]"
+        bind-var-fields="Object.keys(#items[#current] || {}).sort((a,b) => {
+          if (a == 'records') return 1
+          if (b == 'records') return -1
+          return a.localeCompare(b)
+        })">
+        <div class="mt-5"
+          bind-repeater-i="#fields.length"
+          bind-var-field="#fields[#i]"
+          bind-var-obj="#item[#fields[#i]]">
+          <h4>{{#field}}</h4>
+          <table class="table table-sm"
+            bind-var-props="#field == 'records' ? Array.from(#item[#field] || [], (_, i) => i) : Object.keys(#item[#field] || {})">
+            <thead class="table-dark">
+              <tr>
+                <th bind-repeater-i="#props.length">{{#props[#i]}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td bind-statement-1="thisElem.style.whiteSpace = #field == 'records' ? 'pre-wrap' : ''"
+                  bind-repeater-i="#props.length">{{JSON.stringify(#obj[#props[#i]], null, 2)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
