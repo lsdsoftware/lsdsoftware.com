@@ -69,11 +69,11 @@
         <div class="input-group">
           <button type="button" class="btn btn-primary"
             bind-statement-1="thisElem.disabled = !(#current > 0)"
-            bind-event-click="#current--">&#x21d0;</button>
+            bind-event-click="#current--">&#x2b9c;</button>
           <label class="input-group-text">{{#current + 1}} of {{#items.length || 0}}</label>
           <button type="button" class="btn btn-primary"
             bind-statement-1="thisElem.disabled = !(#current + 1 < #items.length)"
-            bind-event-click="#current++">&#x21d2;</button>
+            bind-event-click="#current++">&#x2b9e;</button>
         </div>
         <div class="ml-auto text-nowrap">
           <span class="me-2" style="color: red;">{{#error}}</span>
@@ -85,7 +85,7 @@
       </div>
       <div bind-repeater-if="#current < #items.length ? 1 : 0"
         bind-var-item="#items[#current]"
-        bind-var-fields="Object.keys(#items[#current] || {}).sort((a,b) => {
+        bind-var-fields="Object.keys(#item).sort((a,b) => {
           if (a == 'records') return 1
           if (b == 'records') return -1
           return a.localeCompare(b)
@@ -93,10 +93,10 @@
         <div class="mt-5"
           bind-repeater-i="#fields.length"
           bind-var-field="#fields[#i]"
-          bind-var-obj="#item[#fields[#i]]">
+          bind-var-obj="#item[#field]"
+          bind-var-props="#field == 'records' ? Array.from(#obj, (_, i) => i) : Object.keys(#obj)">
           <h4>{{#field}}</h4>
-          <table class="table table-sm"
-            bind-var-props="#field == 'records' ? Array.from(#item[#field] || [], (_, i) => i) : Object.keys(#item[#field] || {})">
+          <table class="table table-sm">
             <thead class="table-dark">
               <tr>
                 <th bind-repeater-i="#props.length">{{#props[#i]}}</th>
