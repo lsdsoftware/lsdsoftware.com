@@ -44,12 +44,12 @@
       pass = prompt("Enter password:");
       items = [];
       current = 0
-      error = null
+      status = null
       progress = 0
       load()
 
       async function load() {
-        error = null
+        status = null
         progress++
         try {
           const res = await fetch("https://service.lsdsoftware.com/lsdsoftware?capabilities=getDmarcReports-1", {
@@ -63,6 +63,7 @@
             })
           })
           const emails = await res.json()
+          status = { text: `Found ${emails.length} emails` }
           items = R.pipe(
             R.uniqBy(R.prop('hash')),
             R.chain(email => {
@@ -73,14 +74,14 @@
           )(emails)
           current = 0
         } catch (err) {
-          error = err
+          status = { error: err }
         } finally {
           progress--
         }
       }
 
       async function clear() {
-        error = null
+        status = null
         progress++
         try {
           const res = await fetch("https://service.lsdsoftware.com/lsdsoftware?capabilities=clearDmarcReports-1", {
@@ -93,11 +94,12 @@
               pass
             })
           })
-          const items = await res.json()
-          console.log(items.length, 'records deleted')
-          load()
+          const emails = await res.json()
+          status = { text: `${emails.length} emails deleted` }
+          items = []
+          current = 0
         } catch (err) {
-          error = err
+          status = { error: err }
         } finally {
           progress--
         }
@@ -117,7 +119,9 @@
             bind-event-click="#current++">&#x2b9e;</button>
         </div>
         <div class="ml-auto text-nowrap">
-          <span class="me-2" style="color: red;">{{#error}}</span>
+          <span class="me-2"
+            bind-repeater-if="#status ? 1 : 0"
+            bind-statement-1="thisElem.style.color = #status.error ? 'red' : '#080'">{{#status.error || #status.text}}</span>
           <button type="button" class="btn btn-secondary"
             bind-event-click="this.load()">&#x21bb;</button>
           <button type="button" class="btn btn-danger"
