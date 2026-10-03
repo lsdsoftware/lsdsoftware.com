@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contact inbox — LSD Software</title>
+  <link rel="stylesheet" href="../css/common.css">
+  <style>
+    .page { max-width: 900px; } article { border-bottom: 1px solid #ccc; padding: 16px 0; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; }
+    #status { margin: 12px 0; } button { margin-right: 8px; } input { max-width: 100%; }
+  </style>
+</head>
+<body><main class="page">
+  <h1>Contact inbox</h1>
+  <p>Pending messages are emailed daily at 09:00 Vietnam time and cleared after sending.</p>
+  <form id="login"><label>Admin password <input id="password" type="password" required autocomplete="current-password"></label> <button>Open inbox</button></form>
+  <div id="actions" hidden><button id="refresh">Refresh</button><button id="clear">Clear displayed messages</button></div>
+  <p id="status" role="status"></p><div id="messages"></div>
+  <p><a href="index.html">Issue reports</a></p>
+</main><script>
+  let secret = '', items = [], busy = false;
+  const $ = id => document.getElementById(id);
+  async function request(method, extra = {}) {
+    const response = await fetch('https://service.lsdsoftware.com/lsdsoftware?capabilities=feedbackAdmin-1.0', {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, cache: 'no-store',
+      body: JSON.stringify({method, secret, ...extra})
+    });
+    if (!response.ok) throw new Error('Request failed. Check the password and try again.');
+    const text = await response.text();
+    return text ? JSON.parse(text) : undefined;
+  }
+  async function perform(work) {
+    if (busy) return;
+    busy = true;
+    document.querySelectorAll('button').forEach(button => button.disabled = true);
+    $('status').textContent = 'Loading…';
+    try { await work(); $('status').textContent = `${items.length} pending message(s).`; }
+    catch (error) { $('status').textContent = error.message; }
+    finally { busy = false; document.querySelectorAll('button').forEach(button => button.disabled = false); }
+  }
+  async function load() {
+    items = await request('listFeedback');
+    $('actions').hidden = false;
+    $('messages').replaceChildren();
+    for (const item of items) {
+      const article = document.createElement('article');
+      const heading = document.createElement('h2'); heading.textContent = item.subject || '(No subject)';
+      const metadata = document.createElement('p'); metadata.textContent = `${new Date(item.receivedAt).toLocaleString()} — ${item.email || 'No email provided'}`;
+      const message = document.createElement('pre'); message.textContent = item.message;
+      const clear = document.createElement('button'); clear.textContent = 'Clear';
+      clear.onclick = () => perform(async () => { await request('clearFeedback', {ids: [item.id]}); await load(); });
+      article.append(heading, metadata, message, clear);
+      if (item.email && /^[^\s@]+@[^\s@]+$/.test(item.email)) {
+        const reply = document.createElement('a'); reply.textContent = 'Reply by email';
+        reply.href = `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent('Re: ' + (item.subject || 'LSD Software feedback'))}`;
+        article.append(reply);
+      }
+      $('messages').append(article);
+    }
+  }
+  $('login').onsubmit = event => { event.preventDefault(); secret = $('password').value; perform(load); };
+  $('refresh').onclick = () => perform(load);
+  $('clear').onclick = () => {
+    if (!items.length || !confirm(`Clear these ${items.length} messages without emailing them?`)) return;
+    const ids = items.map(item => item.id);
+    perform(async () => { await request('clearFeedback', {ids}); await load(); });
+  };
+</script></body></html>
