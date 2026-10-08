@@ -53,7 +53,9 @@
       article.append(heading, metadata, message, clear);
       if (item.email && /^[^\s@]+@[^\s@]+$/.test(item.email)) {
         const reply = document.createElement('a'); reply.textContent = 'Reply by email';
-        reply.href = `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent('Re: ' + (item.subject || 'LSD Software feedback'))}`;
+        const quoted = item.message.replace(/\r\n?/g, '\n').split('\n').map(line => '> ' + line).join('\r\n');
+        const body = `\r\n\r\nOn ${new Date(item.receivedAt).toLocaleString()}, ${item.email} wrote:\r\n${quoted}`;
+        reply.href = `mailto:${encodeURIComponent(item.email)}?subject=${encodeURIComponent('Re: ' + (item.subject || 'LSD Software feedback'))}&body=${encodeURIComponent(body)}`;
         article.append(reply);
       }
       $('messages').append(article);
